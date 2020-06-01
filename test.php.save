@@ -1,0 +1,80 @@
+ <?php  
+error_reporting(E_ALL); 
+ini_set('display_errors',1); 
+
+include('dbcon.php');
+
+
+
+//POST 값을 읽어온다.
+$q_name=isset($_POST['q_name']) ? $_POST['q_name'] : '';
+$year = isset($_POST['pre_question_year']) ? $_POST['pre_question_year'] : '';
+$year_no=isset($_POST['pre_question_year_no']?$_POST['pre_question_year_no']:'');
+$android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
+
+
+if (1==1){ 
+
+    $sql="select question_no, solution_category_1, solution_category_2, solution_category_3, solution_category_4, solution from qexam_question2 where q_name=:q_name and pre_question_year=:pre_question_year and pre_question_year_no=:pre_question_year_no";
+    $stmt = bindParam(':email',$yearemail);
+    $stmt = $con->prepare($sql);
+    $stmt->execute();
+ 
+    if ($stmt->rowCount() == 0){
+
+        echo "'";
+        echo $name,", ",$category;
+        echo "'은 찾을 수 없습니다.";
+    }
+	else{
+
+   		$data = array(); 
+
+        while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+
+        	extract($row);
+
+            array_push($data,
+               array('e_category'=>$row["e_category"], 'e_class'=>$row["e_class"],'e_name'=>$row["e_name"]));
+        }
+
+
+        if (!$android) {
+            echo "<pre>"; 
+            print_r($data); 
+            echo '</pre>';
+        }else
+        {
+            header('Content-Type: application/json; charset=utf8');
+            $json = json_encode(array("webnautes"=>$data), JSON_PRETTY_PRINT+JSON_UNESCAPED_UNICODE);
+            echo $json;
+        }
+    }
+}
+else {
+    echo "검색하세요 ";
+}
+
+?>
+
+
+
+<?php
+
+$android = strpos($_SERVER['HTTP_USER_AGENT'], "Android");
+
+if (!$android){
+?>
+
+<html>
+   <body>
+   
+
+   
+   </body>
+</html>
+<?php
+}
+
+   
+?>
